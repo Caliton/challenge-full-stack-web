@@ -32,7 +32,7 @@ docker-compose up
 
 Entre em http://localhost:3030/docs
 
-## 🏛 Arquitetura
+## 🏛 Resumo Arquitetura - backend
 
 ```
 src
