@@ -70,7 +70,7 @@ test
   pude implementar a internacionalização com i18n, optei por implementar paginação por rolagem
   infinita, evidando consulta desnecessárias, frontend esta com deploy configurado para rodar com docker
 
-## Pontos de Melhoria se tivesse mais tempo
+## Pontos de Melhoria
 
 ### 👨‍🎨 Frontend
 
