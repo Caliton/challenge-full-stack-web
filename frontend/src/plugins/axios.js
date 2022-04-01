@@ -24,16 +24,15 @@ export default async ({ Vue }) => {
       }
 
       if (error.response) {
+        // eslint-disable-next-line no-unused-vars
         const { status, data } = error.response
         const message = 'Problema interno no servidor'
-
-        console.log(status)
 
         notification.message = (Array.isArray(data.message) ? data.message[0] : data.message) ||
           message
 
         // EventBus.$emit('showNotify', notification)
-        console.log('notification: ', notification)
+        // console.log('notification: ', notification)
 
         return Promise.reject(error)
       }

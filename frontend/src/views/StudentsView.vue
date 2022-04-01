@@ -34,6 +34,7 @@
           single-line
           filled
           clearable
+          @click:clear="reset"
           hide-details
           v-debounce:500ms="refresh"
         >
@@ -63,12 +64,12 @@
           v-model="sortData"
           @change="refresh"
           @click:append-outer="setOrder"
-          :items="headers"
+          :items="optionSort"
           item-text="text"
           item-value="value"
           label="Ordenar"
           :append-outer-icon="
-            order === 'asc' ? 'mdi-sort-reverse-variant' : 'mdi-sort-variant'
+            order === 'ASC' ? 'mdi-sort-reverse-variant' : 'mdi-sort-variant'
           "
           dense
         />
@@ -230,7 +231,7 @@
             </v-btn>
 
             <v-btn
-              @click="editStudent(students.ra)"
+              @click="editStudent(students)"
               small
               color="blue"
               rounde
@@ -269,7 +270,7 @@
           item-value="value"
           label="Ordenar"
           :append-outer-icon="
-            order === 'asc' ? 'mdi-sort-reverse-variant' : 'mdi-sort-variant'
+            order === 'ASC' ? 'mdi-sort-reverse-variant' : 'mdi-sort-variant'
           "
           dense
         />
@@ -301,7 +302,7 @@
       </v-sheet>
     </v-bottom-sheet>
 
-    <di-studants ref="di-students" />
+    <di-studants ref="di-students" @on-hide="responseDialog" />
 
     <v-dialog v-model="dialogDelete" max-width="600px">
       <v-card>
@@ -333,6 +334,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-snackbar v-model="notifier" :timeout="3000" :color="notifierStyle.color">
+      <v-icon>{{ notifierStyle.icon }}</v-icon>
+      <span class="ml-4">{{ $t(notifierStyle.message) }}</span>
+    </v-snackbar>
   </div>
 </template>
 
@@ -346,20 +352,31 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
+    notifier: false,
+    notifierStyle: {
+      message: 'saveSuccess',
+      color: 'green',
+      icon: 'mdi-account-check'
+    },
     tab: localStorage.getItem('visualization_tab'),
     selectedStudent: {},
     search: '',
     loading: false,
     expandMobileMenu: false,
     page: 0,
-    order: 'asc',
+    order: 'ASC',
     headers: [
-      { text: 'Nome', value: 'name' },
-      { text: 'RA', value: 'ra' },
-      { text: 'CPF', value: 'cpf' },
+      { text: 'Nome', value: 'name', sortable: false },
+      { text: 'RA', value: 'ra', sortable: false },
+      { text: 'CPF', value: 'cpf', sortable: false },
       { text: 'Ações', value: 'actions', sortable: false }
     ],
-    sortData: {},
+    optionSort: [
+      { text: 'Nome', value: 'name' },
+      { text: 'RA', value: 'ra' },
+      { text: 'CPF', value: 'cpf' }
+    ],
+    sortData: 'name',
     data: []
   }),
 
@@ -371,7 +388,7 @@ export default {
   },
 
   mounted () {
-    this.sortData = this.headers[0]
+    this.sortData = 'name'
   },
 
   methods: {
@@ -383,11 +400,11 @@ export default {
       this.page++
 
       const params = {
-        _page: this.page,
-        _limit: 10,
-        _sort: this.sortData.value,
-        _order: this.order,
-        name_like: this.search || undefined
+        page: this.page,
+        limit: 10,
+        sort: this.sortData,
+        order: `${this.sortData}=${this.order}`,
+        name: this.search || undefined
       }
 
       if (this.search) {
@@ -398,8 +415,10 @@ export default {
 
       this.$axios
         .get('students', { params })
-        .then(({ data }) => {
-          if (data.length && !this.isRepeat([...data, ...this.data], 'cpf')) {
+        .then(result => {
+          const { data } = result.data
+
+          if (data.length && !this.isRepeat([...data, ...this.data], 'ra')) {
             data.forEach(item => this.data.push(item))
           }
         })
@@ -416,7 +435,7 @@ export default {
     },
 
     setOrder () {
-      this.order = this.order === 'asc' ? 'desc' : 'asc'
+      this.order = this.order === 'ASC' ? 'DESC' : 'ASC'
       this.refresh()
     },
 
@@ -424,6 +443,11 @@ export default {
       this.page = 0
       this.data = []
       this.infiniteScrolling()
+    },
+
+    responseDialog () {
+      this.refresh()
+      this.triggerNotifier()
     },
 
     reset () {
@@ -451,12 +475,25 @@ export default {
         const { ra } = this.selectedStudent
         await this.$axios.delete(`students/${ra}`)
         this.dialogDelete = false
+
+        this.triggerNotifier({
+          message: 'deletedSuccess',
+          icon: 'mdi-account-cancel',
+          color: 'red'
+        })
+
+        this.refresh()
       } catch (e) {
         console.log(e)
       } finally {
         this.loading = false
         this.selectedStudent = {}
       }
+    },
+
+    triggerNotifier (props) {
+      this.notifierStyle = props || this.notifierStyle
+      this.notifier = true
     },
 
     close () {

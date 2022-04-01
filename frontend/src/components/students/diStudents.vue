@@ -131,6 +131,15 @@
       <v-overlay absolute :value="loading">
         <v-progress-circular indeterminate color="blue"></v-progress-circular>
       </v-overlay>
+
+      <v-snackbar
+        v-model="notifier"
+        :timeout="3000"
+        :color="notifierStyle.color"
+      >
+        <v-icon>{{ notifierStyle.icon }}</v-icon>
+        <span class="ml-4">{{ $t(notifierStyle.message) }}</span>
+      </v-snackbar>
     </v-dialog>
   </v-row>
 </template>
@@ -150,6 +159,14 @@ export default {
     dialog: false,
     isEdit: false,
     loading: false,
+    notifierStyle: {
+      message: 'saveSuccess',
+      color: 'green',
+      icon: 'mdi-account-check'
+    },
+
+    notifier: false,
+
     student: {
       ra: '',
       cpf: '',
@@ -171,7 +188,7 @@ export default {
         required: requiredIf(function () {
           return !this.isEdit
         }),
-        maxLength: maxLength(6)
+        maxLength: maxLength(20)
       },
       cpf: {
         required: requiredIf(function () {
@@ -179,7 +196,7 @@ export default {
         })
       },
       email: { required, email },
-      name: { required, maxLength: maxLength(70) }
+      name: { required, maxLength: maxLength(100) }
     }
   },
 
@@ -188,7 +205,7 @@ export default {
       const errors = []
       if (!this.$v.student.ra.$dirty) return errors
 
-      !this.$v.student.ra.maxLength && errors.push(this.$t('errorRaMustSix'))
+      !this.$v.student.ra.maxLength && errors.push(this.$t('errorRaMustLenght'))
 
       !this.$v.student.ra.required && errors.push(this.$t('required'))
       return errors
@@ -249,10 +266,20 @@ export default {
         const { data } = await this.$axios.get(`students/${ra}`)
         this.student = { ...data }
       } catch (e) {
-        console.log(e)
+        this.triggerNotifier({
+          message: 'Teste',
+          icon: 'mdi-qrcode',
+          color: 'red'
+        })
       } finally {
         this.loading = false
       }
+    },
+
+    triggerNotifier (props) {
+      console.log('Fui disparado')
+      this.notifierStyle = props || this.notifierStyle
+      this.notifier = true
     },
 
     async saveStudent () {
@@ -261,15 +288,28 @@ export default {
           return
         }
 
-        const request = this.$axios[this.isEdit ? 'put' : 'post']
+        const request = this.$axios[this.isEdit ? 'patch' : 'post']
 
-        const sendData = this.student
+        const { createdAt, updatedAt, ra, cpf, ...data } = this.student
+        const sendData = data
+        sendData.cpf = cpf.replace(/[^\d]/g, '')
+
+        if (!this.isEdit) {
+          sendData.ra = ra
+        }
 
         this.loading = true
 
-        await request('student', sendData)
+        await request(this.isEdit ? `students/${ra}` : 'students', sendData)
+
+        this.hide()
       } catch (e) {
-        console.log(e)
+        console.log(e.response.data.error)
+        this.triggerNotifier({
+          message: e.response.data.error,
+          icon: 'mdi-qrcode',
+          color: 'red'
+        })
       } finally {
         this.loading = false
       }
@@ -284,7 +324,7 @@ export default {
 
     invalidFields () {
       this.$v.student.$touch()
-      return this.$v.student.$error
+      return this.$v.student.$error || !this.validateCPF(this.student.cpf)
     },
 
     resetStudent () {
@@ -292,7 +332,7 @@ export default {
         ra: '',
         email: '',
         cpf: '',
-        nome: ''
+        name: ''
       }
 
       this.isEdit = false

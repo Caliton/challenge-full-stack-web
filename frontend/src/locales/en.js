@@ -7,9 +7,12 @@ const en = {
   cancel: 'cancel',
   CPFInvalid: 'CPF invalid',
 
+  // D
+  deletedSuccess: 'Successfully deleted',
+
   // E
-  errorNameMust: 'Name must be at most 70 characters long',
-  errorRaMustSix: 'RA must be at most 6 characters long.',
+  errorNameMust: 'Name must be at most 100 characters long',
+  errorRaMustLenght: 'RA must be at most 20 characters long.',
   exclude: 'Exclude',
   excludeStudent: 'Are you sure you want to exclude this student?',
   editStudents: 'Edit Student',
@@ -32,11 +35,13 @@ const en = {
 
   // R
   required: 'Required field',
+  RAAlreadyExistsError: 'Academic record already exists',
 
   // S
   save: 'Save',
   search: 'Search...',
   students: 'Students',
+  saveSuccess: 'Saved successfully',
 
   // T
   technicalChallenge: 'Technical challenge for +A Education.'
