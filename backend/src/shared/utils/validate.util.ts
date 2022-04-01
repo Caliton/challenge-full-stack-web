@@ -5,12 +5,12 @@ import { ValidationError } from '../../domain/errors'
 const getSchemaErrors = (schema: yup.AnyObjectSchema, data: any) => {
   const checkForUnknownKeys = () => {
     const unknownKeys = Object
-      .keys(data || {})
+      .keys(data)
       .filter((key) => Object.keys(schema.fields).indexOf(key) === -1)
 
     if (unknownKeys.length) {
       const error = {
-        errors: unknownKeys.map((item) => `The field ${item} is not allowed`)
+        errors: unknownKeys.map((item) => `The field '${item}' is not allowed`)
       }
       throw error
     }
@@ -19,8 +19,8 @@ const getSchemaErrors = (schema: yup.AnyObjectSchema, data: any) => {
   try {
     checkForUnknownKeys()
     schema.validateSync(data, { abortEarly: false, strict: true })
-  } catch ({ errors, message }) {
-    return errors || message
+  } catch ({ errors }) {
+    return errors
   }
 }
 

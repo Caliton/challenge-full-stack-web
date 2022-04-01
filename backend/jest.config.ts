@@ -36,6 +36,7 @@ export default {
     '/infra/web',
     '/shared/instances/',
     'application.service.ts',
+    'pagination.ts',
     'env.util.ts',
     '.errors.ts',
     'index.ts'

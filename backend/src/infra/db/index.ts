@@ -1,10 +1,18 @@
 import { Pool } from 'pg'
 
-import { getDbHost, getDbName, getDbPort, getDbUser, getDbPass } from '../../shared/utils'
+import {
+  getDbHost,
+  getDbName,
+  getDbPort,
+  getDbUser,
+  getDbPass,
+  getDbPortTest,
+  isTest
+} from '../../shared/utils'
 
 const pool = new Pool({
   host: getDbHost(),
-  port: getDbPort(),
+  port: isTest() ? getDbPortTest() : getDbPort(),
   user: getDbUser(),
   password: getDbPass(),
   database: getDbName()
