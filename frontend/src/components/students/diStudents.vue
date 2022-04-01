@@ -287,7 +287,7 @@ export default {
           return
         }
 
-        const request = this.$axios[this.isEdit ? 'patch' : 'post']
+        const request = this.$axios[this.isEdit ? 'put' : 'post']
 
         const { createdAt, updatedAt, ra, cpf, ...data } = this.student
         const sendData = data

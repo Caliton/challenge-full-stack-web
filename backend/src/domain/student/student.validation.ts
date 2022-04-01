@@ -30,8 +30,8 @@ export const validateCreateStudentOrFail = validateOrFail(yup.object().shape({
  * @throws ValidationError
  */
 export const validateUpdateStudentOrFail = validateOrFail(yup.object().shape({
-  ra: raSchema,
-  name: nameSchema,
-  email: emailSchema,
-  cpf: cpfSchema
+  ra: raSchema.required(),
+  name: nameSchema.required(),
+  email: emailSchema.required(),
+  cpf: cpfSchema.required()
 }))

@@ -31,6 +31,10 @@ export const studentsRoutes = Router()
 *
 *   StudentUpdate:
 *     type: object
+*     required:
+*       - name
+*       - email
+*       - cpf
 *     properties:
 *       name:
 *         type: string
@@ -196,7 +200,7 @@ studentsRoutes.get('/:ra', (req, res, next) => getStudentByRA
 * @swagger
 *
 * /students/{ra}:
-*   patch:
+*   put:
 *     tags: ['Student']
 *     summary: Update student by academic record
 *     parameters:
@@ -231,7 +235,7 @@ studentsRoutes.get('/:ra', (req, res, next) => getStudentByRA
 *       '500':
 *         description: Internal server error
 */
-studentsRoutes.patch('/:ra', async (req, res, next) => updateStudentByRA
+studentsRoutes.put('/:ra', async (req, res, next) => updateStudentByRA
   .execute(req.params.ra, req.body)
   .then((student) => res.status(200).json(student))
   .catch(next))

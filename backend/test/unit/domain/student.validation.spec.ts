@@ -86,6 +86,13 @@ describe('Student | Validation', () => {
     })
 
     it('should throws ValidationError', () => {
+      // not contain name which is a required field
+      expect(() => validateCreateStudentOrFail({
+        ra: 'ABC123',
+        email: 'chris.rock@mail.com',
+        cpf: '34376377031'
+      })).toThrow(ValidationError)
+
       // invalid type for cpf
       expect(() => validateUpdateStudentOrFail({
         ra: 'ABC123',
