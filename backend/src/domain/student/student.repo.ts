@@ -9,6 +9,10 @@ export type IStudentQueryOptions = {
 
 export interface IStudentRepo {
   /**
+   * Checks if there is a deficiency in repository
+   */
+  exists(ra: string): Promise<boolean>
+  /**
    * Save or update Student in repository
    */
   save(student: Partial<Student>): Promise<Student>

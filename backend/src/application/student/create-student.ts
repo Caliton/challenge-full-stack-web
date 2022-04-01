@@ -1,4 +1,4 @@
-import { Student, IStudentRepo } from '../../domain/student'
+import { Student, IStudentRepo, RAAlreadyExistsError } from '../../domain/student'
 import { validateCreateStudentOrFail } from '../../domain/student/student.validation'
 import { uuidv4 } from '../../shared/utils/uuid.util'
 import { IApplicationService } from '../application.service'
@@ -9,12 +9,17 @@ export class CreateStudent implements IApplicationService {
   /**
   * @throws ValidationError
   */
-  async execute (student: Omit<Student, 'ra'>): Promise<Student> {
+  async execute (student: Student): Promise<Student> {
     validateCreateStudentOrFail(student)
+
+    if (student.ra) {
+      const exists = await this.studentRepo.exists(student.ra)
+      if (exists) throw new RAAlreadyExistsError(student.ra)
+    }
 
     const savedStudent = await this.studentRepo.save({
       ...student,
-      ra: this.generateRA()
+      ra: student.ra ? student.ra : this.generateRA()
     })
 
     console.info(`Student created ${JSON.stringify(savedStudent)}`)

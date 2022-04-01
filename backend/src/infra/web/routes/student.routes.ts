@@ -16,6 +16,9 @@ export const studentsRoutes = Router()
 *       - email
 *       - cpf
 *     properties:
+*       ra:
+*         type: string
+*         example: ABC123
 *       name:
 *         type: string
 *         example: João da Silva
