@@ -277,7 +277,6 @@ export default {
     },
 
     triggerNotifier (props) {
-      console.log('Fui disparado')
       this.notifierStyle = props || this.notifierStyle
       this.notifier = true
     },
