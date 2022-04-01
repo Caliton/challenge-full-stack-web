@@ -1,0 +1,60 @@
+version: '3.9'
+
+services:
+  maiseduca_pg:
+    container_name: maiseduca_pg
+    image: postgres:14.2-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: maiseduca
+    tty: true
+    networks:
+      - network
+    healthcheck:
+      test: [
+        "CMD",
+        "pg_isready",
+        "-U",
+        "postgres",
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+  
+  maiseduca_backend:
+    container_name: maiseduca_backend
+    image: caliton/maiseduca-backend
+    depends_on:
+      maiseduca_pg:
+        condition: service_healthy
+    environment:
+      NODE_ENV: dev
+      DB_HOST: maiseduca_pg
+      DB_PORT: 5432
+    ports:
+      - 3030:3030
+    tty: true
+    networks:
+      - network
+    healthcheck:
+      test: curl --fail http://localhost:3030/health-check || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  maiseduca_frontend:
+    container_name: maiseduca_frontend
+    image: caliton/maiseduca-frontend
+    ports:
+      - 8080:80
+    tty: true
+    networks:
+      - network
+    restart: unless-stopped
+
+networks:
+  network:
+    driver: bridge

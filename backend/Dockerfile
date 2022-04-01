@@ -20,7 +20,6 @@ RUN apk --no-cache add curl
 COPY --from=build-stage /api/node_modules ./node_modules
 COPY --from=build-stage /api/dist ./dist
 COPY package.json ./
-COPY ormconfig.js ./
 COPY .env.sample .env
 EXPOSE  4000
 CMD [ "npm", "start" ]
