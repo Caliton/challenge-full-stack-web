@@ -33,9 +33,10 @@ export default {
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '/dist/',
-    '/src/application/application.service.ts',
-    '/src/domain/errors/',
-    '/src/shared/utils/env.util.ts',
+    '/infra/web',
+    '/shared/instances/',
+    'application.service.ts',
+    'env.util.ts',
     '.errors.ts',
     'index.ts'
   ],
