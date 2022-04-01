@@ -3,6 +3,12 @@ import { execSQL } from '..'
 import { PaginationOptions, Paginated } from '../../../domain/common'
 import { IStudentQueryOptions, IStudentRepo, Student } from '../../../domain/student'
 export class StudentRepo implements IStudentRepo {
+  async exists (ra: string): Promise<boolean> {
+    const sql = 'SELECT 1 FROM student WHERE ra = $1;'
+    const [result] = await execSQL<Student>(sql, [ra])
+    return !!result
+  }
+
   async save ({ ra, name, email, cpf }: Partial<Student>): Promise<Student> {
     let fieldsUpdateSql = ''
     if (name) fieldsUpdateSql += '"name" = $2, '
@@ -19,7 +25,6 @@ export class StudentRepo implements IStudentRepo {
     return result
   }
 
-  // TODO Pensar em como montar essas consultas mais seguras, usando $1, $2...
   async find ({
     page = 1,
     limit = 10,
@@ -31,26 +36,42 @@ export class StudentRepo implements IStudentRepo {
     email,
     cpf
   }: PaginationOptions & IStudentQueryOptions = {}): Promise<Paginated<Student>> {
+    let currentParamNumber = 1
+    const params = []
+
     let sql = 'SELECT * FROM student WHERE 1 = 1 '
 
     if (name) {
-      sql += `AND unaccent("name") ILIKE unaccent('%${name}%') `
+      sql += `AND unaccent("name") ILIKE unaccent($${currentParamNumber}) `
+      currentParamNumber++
+      params.push(`%${name}%`)
     }
 
     if (email) {
-      sql += `AND "email" = '${email}' `
+      sql += `AND "email" = $${currentParamNumber} `
+      currentParamNumber++
+      params.push(email)
     }
 
     if (cpf) {
-      sql += `AND "cpf" = '${cpf}' `
+      sql += `AND "cpf" = $${currentParamNumber} `
+      currentParamNumber++
+      params.push(cpf)
     }
 
     sql += `ORDER BY ${Object.entries(order)
       .map((el) => `"${el[0]}" ${el[1]}`)
       .join(', ')} `
 
-    sql += `OFFSET ${(page - 1) * limit} LIMIT ${limit};`
-    const result = await execSQL<Student>(sql)
+    sql += `OFFSET $${currentParamNumber} `
+    currentParamNumber++
+    params.push((page - 1) * limit)
+
+    sql += `LIMIT $${currentParamNumber};`
+    currentParamNumber++
+    params.push(limit)
+
+    const result = await execSQL<Student>(sql, params)
 
     return {
       data: result,
