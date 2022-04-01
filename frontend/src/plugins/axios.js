@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export default async ({ Vue }) => {
   const axiosInstance = axios.create({
-    baseURL: process.env.API || ' http://192.168.0.3:3000/',
+    baseURL: process.env.VUE_APP_API || ' http://localhost:3000/',
     withCredentials: false,
     crossdomain: true,
     headers: {
@@ -20,7 +20,7 @@ export default async ({ Vue }) => {
         color: 'red',
         textColor: 'white',
         icon: 'error_outline',
-        message: 'Alguma coisa aconteceu de ruim :('
+        message: 'Something bad happened:('
       }
 
       if (error.response) {
