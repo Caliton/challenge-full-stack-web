@@ -27,7 +27,7 @@ export const getDbUser = (): string => process.env.DB_USER || 'postgres'
 
 export const getDbPass = (): string => process.env.DB_PASS || 'postgres'
 
-export const getDbName = (): string => process.env.DB_NAME || 'grupoa'
+export const getDbName = (): string => process.env.DB_NAME || 'maiseduca'
 
 // Test config
 

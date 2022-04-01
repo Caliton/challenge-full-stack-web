@@ -5,7 +5,7 @@ import swaggerUi, { SwaggerUiOptions } from 'swagger-ui-express'
 
 import { getServerBaseUrl } from '../../../shared/utils'
 
-const TITLE = 'Grupo A REST API'
+const TITLE = '+A Educa REST API'
 
 const swaggerOpts: swaggerJSDoc.Options = {
   swaggerDefinition: {

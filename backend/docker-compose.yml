@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  pg_grupoa:
-    container_name: pg_grupoa
+  pg_maiseduca:
+    container_name: pg_maiseduca
     image: postgres:14.2-alpine
     environment:
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -18,19 +18,14 @@ services:
     networks:
       - network
     healthcheck:
-      test: [
-        "CMD",
-        "pg_isready",
-        "-U",
-        "${DB_USER}",
-      ]
+      test: [ "CMD", "pg_isready", "-U", "${DB_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 3
     restart: unless-stopped
 
-  pg_grupoa_test:
-    container_name: pg_grupoa_test
+  pg_maiseduca_test:
+    container_name: pg_maiseduca_test
     image: postgres:14.2-alpine
     environment:
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -44,12 +39,7 @@ services:
     networks:
       - network
     healthcheck:
-      test: [
-        "CMD",
-        "pg_isready",
-        "-U",
-        "${DB_USER}",
-      ]
+      test: [ "CMD", "pg_isready", "-U", "${DB_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 3
